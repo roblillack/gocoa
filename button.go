@@ -12,7 +12,6 @@ import (
 // Button represents a button control that can trigger actions.
 type Button struct {
 	buttonPtr C.ButtonPtr
-	tag       int
 	callback  func()
 }
 
