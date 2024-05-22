@@ -12,7 +12,7 @@ import (
 // TextField -Button represents a button control that can trigger actions.
 type TextField struct {
 	textFieldPtr C.TextFieldPtr
-	callback     func()
+	callback     func(value string)
 }
 
 var textfields []*TextField
@@ -137,4 +137,17 @@ func (textField *TextField) SetAlignmentLeft() {
 
 func (textField *TextField) SetAlignmentRight() {
 	C.TextField_SetAlignmentRight(textField.textFieldPtr)
+}
+
+func (textField *TextField) OnChange(fn func(value string)) {
+	textField.callback = fn
+}
+
+//export onTextFieldDidChange
+func onTextFieldDidChange(id C.int) {
+	textFieldID := int(id)
+	if textFieldID < len(textfields) && textfields[textFieldID].callback != nil {
+		tf := textfields[textFieldID]
+		tf.callback(tf.StringValue())
+	}
 }
