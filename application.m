@@ -24,8 +24,6 @@ void releaseSharedApplication() {
 
 void RunApplication() {
     @autoreleasepool {
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-        [NSApp activateIgnoringOtherApps:YES];
         [NSApp run];
         releaseSharedApplication();
     }
@@ -33,4 +31,11 @@ void RunApplication() {
 
 void TerminateApplication() {
     [NSApp terminate:nil];
+}
+
+extern void go_callback(uintptr_t h);
+void RunOnMainLoop(uintptr_t h) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        go_callback(h);
+    });
 }

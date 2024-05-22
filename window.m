@@ -1,5 +1,6 @@
 #import "window.h"
 #import "windowdelegate.h"
+#import "flippedview.h"
 #include "_cgo_export.h"
 
 WindowDelegate *gocoa_windowDelegate = nil;
@@ -11,6 +12,7 @@ void* Window_New(int goWindowID, int x, int y, int width, int height, const char
         styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable)
         backing:NSBackingStoreBuffered
         defer:NO];
+    [window setContentView: [[FlippedView alloc] initWithFrame:windowRect]];
     [window setTitle:[NSString stringWithUTF8String:title]];
     [window autorelease];
 
@@ -27,6 +29,7 @@ void* Centered_Window_New(int goWindowID, int width, int height, const char* tit
         styleMask:(NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable)
         backing:NSBackingStoreBuffered
         defer:NO];
+    [window setContentView: [[FlippedView alloc] initWithFrame:windowRect]];
     [window setTitle:[NSString stringWithUTF8String:title]];
     [window autorelease];
     CGFloat xPos = NSWidth([[window screen] frame])/2 - NSWidth([window frame])/2;
@@ -35,6 +38,7 @@ void* Centered_Window_New(int goWindowID, int width, int height, const char* tit
     [gocoa_windowDelegate setGoWindowID:goWindowID];
     [window setDelegate:gocoa_windowDelegate];
     [window setFrame:NSMakeRect(xPos, yPos, NSWidth([window frame]), NSHeight([window frame])) display:YES];
+    
     return window;
 }
 
@@ -79,6 +83,13 @@ void Window_AddButton(void *wndPtr, ButtonPtr btnPtr)
     [[window contentView] addSubview:button];
 }
 
+void Window_AddDatePicker(void *wndPtr, DatePickerPtr datePickerPtr)
+{
+    NSDatePicker* datePicker = (NSDatePicker*)datePickerPtr;
+    NSWindow* window = (NSWindow*)wndPtr;
+    [[window contentView] addSubview:datePicker];
+}
+
 void Window_AddTextView(void *wndPtr, TextViewPtr tvPtr)
 {
     NSTextView* textview = (NSTextView*)tvPtr;
@@ -100,6 +111,27 @@ void Window_AddProgressIndicator(void *wndPtr, ProgressIndicatorPtr progressIndi
     [[window contentView] addSubview:indicator];
 }
 
+void Window_AddImageView(void *wndPtr, ImageViewPtr imageViewPtr)
+{
+    NSImageView* imageView = (NSImageView*)imageViewPtr;
+    NSWindow* window = (NSWindow*)wndPtr;
+    [[window contentView] addSubview:imageView];
+}
+
+void Window_AddSlider(void *wndPtr, SliderPtr sliderPtr)
+{
+    NSSlider* slider = (NSSlider*)sliderPtr;
+    NSWindow* window = (NSWindow*)wndPtr;
+    [[window contentView] addSubview:slider];
+}
+
+void Window_AddComboBox(void *wndPtr, ComboBoxPtr comboBoxPtr)
+{
+    NSComboBox* comboBox = (NSComboBox*)comboBoxPtr;
+    NSWindow* window = (NSWindow*)wndPtr;
+    [[window contentView] addSubview:comboBox];
+}
+
 void Window_Update(void *wndPtr)
 {
     NSWindow* window = (NSWindow*)wndPtr;
@@ -110,4 +142,47 @@ void Window_SetTitle(void *wndPtr, const char* title)
 {
     NSWindow* window = (NSWindow*)wndPtr;
     [window setTitle:[NSString stringWithUTF8String:title]];
+}
+
+void Window_SetMiniaturizeButtonEnabled(void *wndPtr, int enabled) {
+    NSWindow* window = (NSWindow*)wndPtr;
+    NSButton *button = [window standardWindowButton:NSWindowMiniaturizeButton];
+    [button setEnabled: enabled];
+}
+
+void Window_SetZoomButtonEnabled(void *wndPtr, int enabled) {
+    NSWindow* window = (NSWindow*)wndPtr;
+    NSButton *button = [window standardWindowButton:NSWindowZoomButton];
+    [button setEnabled: enabled];
+}
+
+void Window_SetCloseButtonEnabled(void *wndPtr, int enabled) {
+    NSWindow* window = (NSWindow*)wndPtr;
+    NSButton *button = [window standardWindowButton:NSWindowCloseButton];
+    [button setEnabled: enabled];
+}
+
+void Window_SetAllowsResizing(void *wndPtr, int allowsResizing) {
+    NSWindow* window = (NSWindow*)wndPtr;
+    if(allowsResizing) {
+        window.styleMask |= NSWindowStyleMaskResizable;
+    } else {
+        window.styleMask &= ~NSWindowStyleMaskResizable;
+    }
+}
+
+void Window_AddDefaultQuitMenu(void *wndPtr) {
+    NSWindow* window = (NSWindow*)wndPtr;
+
+    id menubar = [[NSMenu new] autorelease];
+    id appMenuItem = [[NSMenuItem new] autorelease];
+    [menubar addItem:appMenuItem];
+    [NSApp setMainMenu:menubar];
+    id appMenu = [[NSMenu new] autorelease];
+    id appName = [[NSProcessInfo processInfo] processName];
+    id quitTitle = [@"Quit " stringByAppendingString:appName];
+    id quitMenuItem = [[[NSMenuItem alloc] initWithTitle:quitTitle
+        action:@selector(terminate:) keyEquivalent:@"q"] autorelease];
+    [appMenu addItem:quitMenuItem];
+    [appMenuItem setSubmenu:appMenu];
 }

@@ -92,6 +92,11 @@ func (wnd *Window) AddButton(btn *Button) {
 	C.Window_AddButton(wnd.winPtr, btn.buttonPtr)
 }
 
+// AddDatePicker adds a DatePicker to the window.
+func (wnd *Window) AddDatePicker(datePicker *DatePicker) {
+	C.Window_AddDatePicker(wnd.winPtr, datePicker.datePickerPtr)
+}
+
 // AddTextView - adds a Text View to the window.
 func (wnd *Window) AddTextView(tv *TextView) {
 	C.Window_AddTextView(wnd.winPtr, tv.textViewPtr)
@@ -102,9 +107,27 @@ func (wnd *Window) AddTextField(tf *TextField) {
 	C.Window_AddTextField(wnd.winPtr, tf.textFieldPtr)
 }
 
+// AddTextField - adds a Button to the window.
+func (wnd *Window) AddLabel(tv *TextField) {
+	C.Window_AddTextField(wnd.winPtr, tv.textFieldPtr)
+}
+
 // AddProgressIndicator adds a ProgressIndicator to the window.
 func (wnd *Window) AddProgressIndicator(indicator *ProgressIndicator) {
 	C.Window_AddProgressIndicator(wnd.winPtr, indicator.progressIndicatorPtr)
+}
+
+// AddImageView adds an ImageView to the window.
+func (wnd *Window) AddImageView(imageView *ImageView) {
+	C.Window_AddImageView(wnd.winPtr, imageView.imageViewPtr)
+}
+
+func (wnd *Window) AddSlider(slider *Slider) {
+	C.Window_AddSlider(wnd.winPtr, slider.sliderPtr)
+}
+
+func (wnd *Window) AddComboBox(comboBox *ComboBox) {
+	C.Window_AddComboBox(wnd.winPtr, comboBox.comboBoxPtr)
 }
 
 // Update - forces the whole window to repaint
@@ -116,6 +139,42 @@ func (wnd *Window) SetTitle(title string) {
 	cTitle := C.CString(title)
 	defer C.free(unsafe.Pointer(cTitle))
 	C.Window_SetTitle(wnd.winPtr, cTitle)
+}
+
+func (wnd *Window) SetMiniaturizeButtonEnabled(enabled bool) {
+	if enabled {
+		C.Window_SetMiniaturizeButtonEnabled(wnd.winPtr, C.int(1))
+	} else {
+		C.Window_SetMiniaturizeButtonEnabled(wnd.winPtr, C.int(0))
+	}
+}
+
+func (wnd *Window) SetZoomButtonEnabled(enabled bool) {
+	if enabled {
+		C.Window_SetZoomButtonEnabled(wnd.winPtr, C.int(1))
+	} else {
+		C.Window_SetZoomButtonEnabled(wnd.winPtr, C.int(0))
+	}
+}
+
+func (wnd *Window) SetCloseButtonEnabled(enabled bool) {
+	if enabled {
+		C.Window_SetCloseButtonEnabled(wnd.winPtr, C.int(1))
+	} else {
+		C.Window_SetCloseButtonEnabled(wnd.winPtr, C.int(0))
+	}
+}
+
+func (wnd *Window) SetAllowsResizing(allowsResizing bool) {
+	if allowsResizing {
+		C.Window_SetAllowsResizing(wnd.winPtr, C.int(1))
+	} else {
+		C.Window_SetAllowsResizing(wnd.winPtr, C.int(0))
+	}
+}
+
+func (wnd *Window) AddDefaultQuitMenu() {
+	C.Window_AddDefaultQuitMenu(wnd.winPtr)
 }
 
 func (wnd *Window) OnDidResize(fn EventHandler) {

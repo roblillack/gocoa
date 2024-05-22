@@ -37,3 +37,8 @@ func (textview *TextView) SetText(text string) {
 func (textview *TextView) Remove() {
 	C.TextView_Remove(textview.textViewPtr)
 }
+
+// SetText sets the text of the text view
+func (textview *TextView) SetFontSize(size int) {
+	C.TextView_SetFontSize(textview.textViewPtr, C.int(size))
+}
